@@ -8,21 +8,12 @@
 </head>
 <body>
     <div class="container">
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <h2>Companion Proxy</h2>
-            </div>
-            <nav class="sidebar-nav">
-                <button class="nav-item active" data-page="actions">Actions</button>
-                <button class="nav-item" data-page="logs">Logs</button>
-            </nav>
-        </div>
-        
         <div class="main-content">
             <!-- Actions Page -->
             <div id="actions-page" class="page active">
                 <div class="toolbar">
                     <button class="btn-primary" onclick="openActionModal()">New Action</button>
+                    <button id="theme-toggle" class="btn-secondary" onclick="toggleTheme()">Toggle Theme</button>
                 </div>
                 <div class="table-container">
                     <table id="actions-table">

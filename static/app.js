@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
     loadActions();
     loadLogs();
     startAutoRefresh();
+
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.body.setAttribute('data-theme', savedTheme);
     
     document.querySelectorAll('.nav-item').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -204,4 +207,13 @@ function startAutoRefresh() {
             loadLogs();
         }
     }, 2000);
+}
+
+// Style
+function toggleTheme() {
+    const body = document.body;
+    const currentTheme = body.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    body.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
 }

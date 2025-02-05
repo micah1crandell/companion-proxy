@@ -161,7 +161,6 @@ If you are running the server, you can interact with the API:
 ---
 
 ## Notes
-- Ensure you have Go installed to use `go run`.
 - Actions are persisted in a JSON file (`companion_proxy_data.json`).
 - Headers should be provided in "Key:Value" format.
 

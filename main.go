@@ -1,3 +1,6 @@
+// run main.go server -port=8080
+// ./companion-proxy server -port=8080
+
 package main
 
 import (
