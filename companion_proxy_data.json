@@ -1,0 +1,28 @@
+{
+  "actions": {
+    "107455908a7c2e56": {
+      "id": "107455908a7c2e56",
+      "name": "SLIDE ON",
+      "url": "http://192.168.1.51:8888/api/location/5/0/1/press",
+      "method": "POST",
+      "headers": {},
+      "body": ""
+    },
+    "63747e4e12d5470b": {
+      "id": "63747e4e12d5470b",
+      "name": "SLIDE OFF",
+      "url": "http://192.168.1.51:8888/api/location/5/0/2/press",
+      "method": "POST",
+      "headers": {},
+      "body": ""
+    }
+  },
+  "logs": [
+    {
+      "timestamp": "2025-02-04T19:21:56.106184-07:00",
+      "action_id": "63747e4e12d5470b",
+      "success": true,
+      "response": "Status: 200 OK"
+    }
+  ]
+}

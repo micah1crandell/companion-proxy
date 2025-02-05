@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Companion Proxy</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Companion Proxy</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-page="actions">Actions</button>
+                <button class="nav-item" data-page="logs">Logs</button>
+            </nav>
+        </div>
+        
+        <div class="main-content">
+            <!-- Actions Page -->
+            <div id="actions-page" class="page active">
+                <div class="toolbar">
+                    <button class="btn-primary" onclick="openActionModal()">New Action</button>
+                </div>
+                <div class="table-container">
+                    <table id="actions-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>URL</th>
+                                <th>Method</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs Page -->
+            <div id="logs-page" class="page">
+                <div class="table-container">
+                    <table id="logs-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Action ID</th>
+                                <th>Status</th>
+                                <th>Response</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Modal -->
+    <div id="action-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Action</h3>
+                <button class="icon-btn" onclick="closeActionModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="action-form">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="action-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>URL</label>
+                        <input type="url" id="action-url" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Method</label>
+                        <select id="action-method">
+                            <option>POST</option>
+                            <option>PUT</option>
+                            <option>DELETE</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Headers</label>
+                        <div id="headers-container"></div>
+                        <button type="button" class="btn-secondary" onclick="addHeaderField()">Add Header</button>
+                    </div>
+                    <div class="form-group">
+                        <label>Body</label>
+                        <textarea id="action-body" rows="4"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="closeActionModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
