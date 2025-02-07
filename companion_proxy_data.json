@@ -29,6 +29,18 @@
       "action_id": "107455908a7c2e56",
       "success": false,
       "response": "Request failed: Post \"http://192.168.1.51:8888/api/location/5/0/1/press\": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+    },
+    {
+      "timestamp": "2025-02-06T21:50:53.438821-07:00",
+      "action_id": "b674276f899f3a77",
+      "success": false,
+      "response": "Request failed: Post \"http://asd\": dial tcp: lookup asd: no such host"
+    },
+    {
+      "timestamp": "2025-02-06T21:52:52.930799-07:00",
+      "action_id": "b674276f899f3a77",
+      "success": false,
+      "response": "Request failed: Post \"http://asd\": dial tcp: lookup asd: no such host"
     }
   ]
 }

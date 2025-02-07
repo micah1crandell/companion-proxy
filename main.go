@@ -461,38 +461,11 @@ func createAction(w http.ResponseWriter, r *http.Request) {
 func updateAction(w http.ResponseWriter, r *http.Request) {
 	var updatedAction Action
 	if err := json.NewDecoder(r.Body).Decode(&updatedAction); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, "Invalid JSON request body", http.StatusBadRequest)
 		return
 	}
 
-	if updatedAction.ID == "" {
-		http.Error(w, "Action ID is required", http.StatusBadRequest)
-		return
-	}
-
-	actionsMu.Lock()
-	defer actionsMu.Unlock()
-
-	// Check for duplicate name excluding current action.
-	for _, a := range actions {
-		if a.ID != updatedAction.ID && a.Name == updatedAction.Name {
-			http.Error(w, "Action name must be unique", http.StatusBadRequest)
-			return
-		}
-	}
-
-	if _, exists := actions[updatedAction.ID]; !exists {
-		http.Error(w, "Action not found", http.StatusNotFound)
-		return
-	}
-
-	actions[updatedAction.ID] = updatedAction
-
-	respondJSON(w, updatedAction)
-	saveToFile()
-}
-
-func deleteAction(w http.ResponseWriter, r *http.Request) {
+	// Extract action ID from the URL path
 	actionID := strings.TrimPrefix(r.URL.Path, "/actions/")
 	if actionID == "" {
 		http.Error(w, "Action ID is required", http.StatusBadRequest)
@@ -502,14 +475,58 @@ func deleteAction(w http.ResponseWriter, r *http.Request) {
 	actionsMu.Lock()
 	defer actionsMu.Unlock()
 
+	// Check if the action exists
+	action, exists := actions[actionID]
+	if !exists {
+		http.Error(w, "Action not found", http.StatusNotFound)
+		return
+	}
+
+	// Ensure name uniqueness (excluding self)
+	for _, a := range actions {
+		if a.ID != actionID && a.Name == updatedAction.Name {
+			http.Error(w, "Action name must be unique", http.StatusBadRequest)
+			return
+		}
+	}
+
+	// Apply updates
+	action.Name = updatedAction.Name
+	action.URL = updatedAction.URL
+	action.Method = updatedAction.Method
+	action.Headers = updatedAction.Headers
+	action.Body = updatedAction.Body
+	actions[actionID] = action
+
+	saveToFile() // Persist changes
+
+	respondJSON(w, action) // Send back the updated action
+}
+
+func deleteAction(w http.ResponseWriter, r *http.Request) {
+	actionID := strings.TrimPrefix(r.URL.Path, "/actions/")           // Extract ID from path
+	log.Printf("Received DELETE request for action ID: %s", actionID) // Debugging
+
+	if actionID == "" {
+		log.Println("Error: No action ID provided")
+		http.Error(w, "Action ID is required", http.StatusBadRequest)
+		return
+	}
+
+	actionsMu.Lock()
+	defer actionsMu.Unlock()
+
 	if _, exists := actions[actionID]; !exists {
+		log.Printf("Error: Action ID %s not found", actionID) // Debugging
 		http.Error(w, "Action not found", http.StatusNotFound)
 		return
 	}
 
 	delete(actions, actionID)
-	w.WriteHeader(http.StatusNoContent)
-	saveToFile()
+	saveToFile() // Persist changes
+
+	log.Printf("Action ID %s deleted successfully", actionID) // Debugging
+	w.WriteHeader(http.StatusNoContent)                       // 204 No Content (Success)
 }
 
 func triggerAction(w http.ResponseWriter, _ *http.Request, actionID string) {

@@ -49,6 +49,23 @@
         </div>
     </div>
 
+    <!-- Confirm Delete Modal -->
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirm Delete</h3>
+                <button class="icon-btn" onclick="closeConfirmModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this action? This cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeConfirmModal()">Cancel</button>
+                <button class="btn-primary" onclick="confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Action Modal -->
     <div id="action-modal" class="modal">
         <div class="modal-content">
@@ -61,7 +78,8 @@
                     <div class="form-group">
                         <label>Name</label>
                         <input type="text" id="action-name" required>
-                    </div>
+                        <small id="name-error" style="color: red;"></small>
+                    </div>                    
                     <div class="form-group">
                         <label>URL</label>
                         <input type="url" id="action-url" required>

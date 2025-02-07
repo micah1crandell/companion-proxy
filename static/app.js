@@ -34,6 +34,9 @@ function renderActions(actions) {
     const tbody = document.querySelector('#actions-table tbody');
     tbody.innerHTML = '';
     
+    // Sort actions alphabetically by name
+    actions.sort((a, b) => a.name.localeCompare(b.name));
+    
     actions.forEach(action => {
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -78,14 +81,34 @@ function renderLogs(logs) {
     });
 }
 
-function openActionModal(action = null) {
+let existingActionNames = [];
+
+async function fetchExistingActionNames() {
+    try {
+        const response = await fetch('/actions');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const actions = await response.json();
+        existingActionNames = actions.map(a => a.name.toLowerCase());
+    } catch (error) {
+        console.error('Error fetching action names:', error);
+    }
+}
+
+async function openActionModal(action = null) {
     autoRefresh = false;
+
+    // Fetch existing action names to validate uniqueness
+    await fetchExistingActionNames();
 
     currentActionId = action?.id || null;
     document.getElementById('action-modal').style.display = 'flex';
-    
+
+    const nameInput = document.getElementById('action-name');
+    const submitButton = document.querySelector('#action-form button[type="submit"]');
+    const nameError = document.getElementById('name-error');
+
     if (action) {
-        document.getElementById('action-name').value = action.name;
+        nameInput.value = action.name;
         document.getElementById('action-url').value = action.url;
         document.getElementById('action-method').value = action.method;
         document.getElementById('action-body').value = action.body;
@@ -94,6 +117,18 @@ function openActionModal(action = null) {
         document.getElementById('action-form').reset();
         renderHeaders({});
     }
+
+    // Real-time validation for unique name
+    nameInput.addEventListener('input', () => {
+        const nameValue = nameInput.value.trim().toLowerCase();
+        if (existingActionNames.includes(nameValue) && nameValue !== action?.name.toLowerCase()) {
+            nameError.textContent = "Action name must be unique.";
+            submitButton.disabled = true;
+        } else {
+            nameError.textContent = "";
+            submitButton.disabled = false;
+        }
+    });
 }
 
 function closeActionModal() {
@@ -133,27 +168,41 @@ document.getElementById('action-form').addEventListener('submit', async (e) => {
     });
 
     const action = {
-        name: document.getElementById('action-name').value,
-        url: document.getElementById('action-url').value,
-        method: document.getElementById('action-method').value,
+        id: currentActionId, // Ensure the ID is included when updating
+        name: document.getElementById('action-name').value.trim(),
+        url: document.getElementById('action-url').value.trim(),
+        method: document.getElementById('action-method').value.trim(),
         headers: headers,
-        body: document.getElementById('action-body').value
+        body: document.getElementById('action-body').value.trim()
     };
 
     try {
         if (currentActionId) {
-            await fetch(`/actions/${currentActionId}`, {
+            // Update existing action (PUT request)
+            const response = await fetch(`/actions/${currentActionId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(action)
             });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Update failed: ${errorText}`);
+            }
         } else {
-            await fetch('/actions', {
+            // Create new action (POST request)
+            const response = await fetch('/actions', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(action)
             });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Creation failed: ${errorText}`);
+            }
         }
+
         closeActionModal();
         loadActions();
     } catch (error) {
@@ -163,15 +212,36 @@ document.getElementById('action-form').addEventListener('submit', async (e) => {
 });
 
 async function deleteAction(id) {
-    if (confirm('Are you sure you want to delete this action?')) {
-        try {
-            await fetch(`/actions/${id}`, { method: 'DELETE' });
-            loadActions();
-        } catch (error) {
-            console.error('Error deleting action:', error);
-            alert('Failed to delete action');
+    currentActionId = id;
+    document.getElementById('confirm-modal').style.display = 'flex';
+}
+
+async function confirmDelete() {
+    if (!currentActionId) return;
+
+    try {
+        const response = await fetch(`/actions/${currentActionId}`, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`Error deleting action: ${errorText}`);
+            throw new Error(`Delete failed: ${errorText}`);
         }
+
+        console.log(`Action ${currentActionId} deleted successfully!`);
+        closeConfirmModal();
+        await loadActions();
+    } catch (error) {
+        console.error('Failed to delete action:', error);
+        alert('Failed to delete action: ' + error.message);
     }
+}
+
+function closeConfirmModal() {
+    document.getElementById('confirm-modal').style.display = 'none';
+    currentActionId = null;
 }
 
 async function triggerAction(id) {

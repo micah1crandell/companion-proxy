@@ -134,6 +134,12 @@ th {
     margin-bottom: 20px;
 }
 
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
 .icon-btn {
     background: none;
     border: none;
